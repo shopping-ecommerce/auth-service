@@ -55,7 +55,7 @@ public class UserController {
      * @param email the email of the user
      * @return the user information
      */
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/search/e/{email}")
     public ResponseEntity<UserResponse> getUserByEmail(@PathVariable String email) {
         var authentication = SecurityContextHolder.getContext().getAuthentication();

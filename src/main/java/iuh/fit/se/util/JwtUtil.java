@@ -4,8 +4,10 @@ import java.security.Key;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 import java.util.StringJoiner;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -53,17 +55,30 @@ public class JwtUtil {
 
     public String generateToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
-        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+        JWTClaimsSet.Builder claimsBuilder = new JWTClaimsSet.Builder()
                 .subject(user.getEmail())
-                .issuer("SavorGo")
+                .issuer("Shopping")
                 //                .audience(user.getFirstName())
-                .claim("scope", buildScope(user))
+//                .claim("scope", buildScopes(user))
                 .issueTime(new Date())
                 .expirationTime(new Date(
                         Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
-                .jwtID(UUID.randomUUID().toString())
-                .build();
+                .jwtID(UUID.randomUUID().toString());
 
+        // Thêm claim "roles" (danh sách vai trò)
+        List<String> roles = user.getRoles().stream()
+                .map(role -> "ROLE_" + role.getName())
+                .collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(roles)) {
+            claimsBuilder.claim("roles", roles);
+        }
+
+        // Thêm claim "scopes" (danh sách quyền)
+        String scopes = buildScopes(user);
+        if (!scopes.isEmpty()) {
+            claimsBuilder.claim("scopes", scopes.split(" "));
+        }
+        JWTClaimsSet jwtClaimsSet = claimsBuilder.build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
 
         JWSObject jwsObject = new JWSObject(header, payload);
@@ -76,7 +91,7 @@ public class JwtUtil {
         }
     }
 
-    private String buildScope(User user) {
+    private String buildScopes(User user) {
         StringJoiner stringJoiner = new StringJoiner(" ");
         if (!CollectionUtils.isEmpty(user.getRoles())) {
             user.getRoles().forEach(s -> {
