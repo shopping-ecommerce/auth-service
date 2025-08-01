@@ -22,9 +22,11 @@ public interface AuthenticationService {
 
     AuthenticationResponse loginWithEmailPassword(AuthenticationRequest request);
 
-    void changePassword(String jwtToken, ChangePasswordRequest request);
+    void changePassword(ChangePasswordRequest request);
 
     AuthenticationResponse register(AuthenticationRegisterRequest request) throws JsonProcessingException;
 
     AuthenticationResponse verifyEmail(VerifyOTPRequest request) throws JsonProcessingException;
+
+    void assignRoleToUser(AssignRoleRequest request) throws JsonProcessingException;
 }

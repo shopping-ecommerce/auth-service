@@ -3,9 +3,15 @@ package iuh.fit.se.service.impl;
 import java.text.ParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import iuh.fit.se.entity.Role;
+import iuh.fit.se.enums.UserRoleEnum;
+import iuh.fit.se.repository.RoleRepository;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +52,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final InvalidatedTokenRepository invalidatedTokenRepository;
     private final OTPService otpService;
     private final RedisTemplate<String, String> redisTemplate;
+    private final RoleRepository roleRepository;
 
     @Override
     public AuthenticationResponse loginWithEmailPassword(AuthenticationRequest request) {
@@ -53,7 +60,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         String password = request.getPassword();
 
         // Tìm user trong database
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
 
         // Kiểm tra mật khẩu
         if (!passwordEncoder.matches(password, user.getPassword())) {
@@ -142,9 +149,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void changePassword(String jwtToken, ChangePasswordRequest request) {
+    public void changePassword( ChangePasswordRequest request) {
         // Lấy email từ token JWT
-        String email = jwtUtil.extractEmail(jwtToken);
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
         // Tìm người dùng trong database
         User user = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -196,6 +203,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .lastName(registerRequest.getLastName())
                 .address(registerRequest.getAddress())
                 .build());
-        return AuthenticationResponse.builder().build();
+        return AuthenticationResponse.builder()
+                .message("Success")
+                .build();
     }
+
+    @Override
+    public void assignRoleToUser(AssignRoleRequest request) throws JsonProcessingException {
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        Role sellerRole = roleRepository.findByName(UserRoleEnum.SELLER.name());
+
+        Set<Role> roles = new HashSet<>(user.getRoles());
+        if(!roles.contains(sellerRole)){
+            roles.add(sellerRole);
+            user.setRoles(roles);
+            userRepository.save(user);
+        }
+    }
+
 }

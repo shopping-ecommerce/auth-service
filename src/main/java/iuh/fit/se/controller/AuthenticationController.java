@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
@@ -70,10 +71,12 @@ public class AuthenticationController {
         return ApiResponse.<UserResponse>builder().result(userResponse).build();
     }
 
+//    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasAuthority('DELETE_SELLER')")
+    @PreAuthorize("hasAuthority('UPDATE_USER')")
     @PostMapping("/change-password")
-    public ApiResponse<String> changePassword(
-            @RequestHeader("Authorization") String token, @RequestBody ChangePasswordRequest request) {
-        authenticationService.changePassword(token.replace("Bearer ", ""), request);
+    public ApiResponse<String> changePassword(@RequestBody ChangePasswordRequest request) {
+        authenticationService.changePassword(request);
         return ApiResponse.<String>builder()
                 .result("Password changed successfully")
                 .build();
@@ -142,5 +145,14 @@ public class AuthenticationController {
                     .message("Có lỗi xảy ra")
                     .build();
         }
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/assign-role")
+    public ApiResponse<String> assignRole(@RequestBody AssignRoleRequest request) throws JsonProcessingException {
+        authenticationService.assignRoleToUser(request);
+        return ApiResponse.<String>builder()
+                .code(200)
+                .result("Assign role successfully")
+                .build();
     }
 }
