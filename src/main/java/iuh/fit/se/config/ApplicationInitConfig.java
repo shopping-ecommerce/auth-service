@@ -1,6 +1,7 @@
 package iuh.fit.se.config;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -31,50 +32,75 @@ public class ApplicationInitConfig {
             UserRepository userRepository, PermissionRepository permissionRepository, RoleRepository roleRepository) {
         return args -> {
             // Initialize permissions
-            var permissions = new HashSet<Permission>();
-            permissions.add(Permission.builder()
-                    .name("CREATE_USER")
-                    .description("Create a new user")
-                    .build());
-            permissions.add(Permission.builder()
-                    .name("UPDATE_USER")
-                    .description("Update an existing user")
-                    .build());
-            permissions.add(Permission.builder()
-                    .name("DELETE_USER")
-                    .description("Delete an existing user")
-                    .build());
-            permissions.add(Permission.builder()
-                    .name("VIEW_USER")
-                    .description("View user details")
-                    .build());
-            permissionRepository.saveAll(permissions);
+            Set<Permission> allPermissions = new HashSet<>();
+            allPermissions.add(Permission.builder().name("CREATE_USER").description("Create a new user").build());
+            allPermissions.add(Permission.builder().name("UPDATE_USER").description("Update an existing user").build());
+            allPermissions.add(Permission.builder().name("DELETE_USER").description("Delete an existing user").build());
+            allPermissions.add(Permission.builder().name("VIEW_USER").description("View user details").build());
+            allPermissions.add(Permission.builder().name("CREATE_SELLER").description("Create a new seller").build());
+            allPermissions.add(Permission.builder().name("UPDATE_SELLER").description("Update an existing seller").build());
+            allPermissions.add(Permission.builder().name("DELETE_SELLER").description("Delete an existing seller").build());
+            allPermissions.add(Permission.builder().name("VIEW_SELLER").description("View seller details").build());
+            allPermissions.add(Permission.builder().name("CREATE_PRODUCT").description("Create a new product").build());
+            allPermissions.add(Permission.builder().name("UPDATE_PRODUCT").description("Update an existing product").build());
+            allPermissions.add(Permission.builder().name("DELETE_PRODUCT").description("Delete an existing product").build());
+            allPermissions.add(Permission.builder().name("VIEW_PRODUCT").description("View product details").build());
+            allPermissions.add(Permission.builder().name("CREATE_ORDER").description("Create a new order").build());
+            allPermissions.add(Permission.builder().name("DELETE_ORDER").description("Delete an existing order").build());
+            allPermissions.add(Permission.builder().name("VIEW_ORDER").description("View order details").build());
+            permissionRepository.saveAll(allPermissions);
+
+            // Define permissions for each role
+            Set<Permission> adminPermissions = new HashSet<>(allPermissions); // ADMIN có tất cả quyền
+            Set<Permission> sellerPermissions = new HashSet<>();
+            sellerPermissions.addAll(allPermissions.stream()
+                    .filter(p -> p.getName().equals("CREATE_PRODUCT") ||
+                            p.getName().equals("UPDATE_PRODUCT") ||
+                            p.getName().equals("DELETE_PRODUCT") ||
+                            p.getName().equals("VIEW_PRODUCT") ||
+                            p.getName().equals("VIEW_ORDER"))
+                    .toList());
+            Set<Permission> customerPermissions = new HashSet<>();
+            customerPermissions.addAll(allPermissions.stream()
+                    .filter(p -> p.getName().equals("VIEW_PRODUCT") ||
+                            p.getName().equals("CREATE_ORDER") ||
+                            p.getName().equals("VIEW_ORDER") ||
+                            p.getName().equals("CREATE_SELLER") ||
+                            p.getName().equals("UPDATE_USER"))
+                    .toList());
 
             // Initialize roles
-            var roles = new HashSet<Role>();
+            Set<Role> roles = new HashSet<>();
             roles.add(Role.builder()
-                    .name(UserRoleEnum.MANAGER.name())
-                    .description("Manager role")
-                    .permissions(permissions)
+                    .name(UserRoleEnum.ADMIN.name())
+                    .description("Admin role with full permissions")
+                    .permissions(adminPermissions)
+                    .build());
+            roles.add(Role.builder()
+                    .name(UserRoleEnum.SELLER.name())
+                    .description("Seller role with product and order management permissions")
+                    .permissions(sellerPermissions)
+                    .build());
+            roles.add(Role.builder()
+                    .name(UserRoleEnum.CUSTOMER.name())
+                    .description("Customer role with shopping permissions")
+                    .permissions(customerPermissions)
                     .build());
             roleRepository.saveAll(roles);
-            var roles1 = new HashSet<Role>();
-            roles1.add(Role.builder()
-                    .name(UserRoleEnum.CUSTOMER.name())
-                    .description("Customer role")
-                    .permissions(permissions)
-                    .build());
-            roleRepository.saveAll(roles1);
 
             // Initialize admin user
             if (userRepository.findByEmail("admin").isEmpty()) {
                 User user = User.builder()
                         .email("admin")
                         .password(passwordEncoder.encode("admin"))
-                        .roles(roles)
+                        .roles(Set.of(roles.stream()
+                                .filter(r -> r.getName().equals(UserRoleEnum.ADMIN.name()))
+                                .findFirst()
+                                .orElseThrow(() -> new RuntimeException("Admin role not found")))
+                        )
                         .build();
                 userRepository.save(user);
-                log.warn("admin user has been created with default password: admin");
+                log.warn("Admin user has been created with default password: admin");
             }
         };
     }
