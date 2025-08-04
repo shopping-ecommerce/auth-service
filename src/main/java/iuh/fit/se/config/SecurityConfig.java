@@ -39,7 +39,6 @@ public class SecurityConfig {
         "/authentication/register",
         "/authentication/verifyOTP",
         "/authentication/verifyFromEmail",
-            "/authentication/assgin-role"
     };
     private final JwtUtil jwtUtil;
 
