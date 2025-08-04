@@ -95,7 +95,7 @@ public class JwtUtil {
         StringJoiner stringJoiner = new StringJoiner(" ");
         if (!CollectionUtils.isEmpty(user.getRoles())) {
             user.getRoles().forEach(s -> {
-                stringJoiner.add("ROLE_" + s.getName());
+//                stringJoiner.add("ROLE_" + s.getName());
                 if (!CollectionUtils.isEmpty(s.getPermissions()))
                     s.getPermissions().forEach(p -> stringJoiner.add(p.getName()));
             });
