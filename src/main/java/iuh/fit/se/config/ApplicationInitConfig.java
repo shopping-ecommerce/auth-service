@@ -48,6 +48,7 @@ public class ApplicationInitConfig {
             allPermissions.add(Permission.builder().name("CREATE_ORDER").description("Create a new order").build());
             allPermissions.add(Permission.builder().name("DELETE_ORDER").description("Delete an existing order").build());
             allPermissions.add(Permission.builder().name("VIEW_ORDER").description("View order details").build());
+            allPermissions.add(Permission.builder().name("UPLOAD_FILE").description("Upload file to S3").build());
             permissionRepository.saveAll(allPermissions);
 
             // Define permissions for each role
@@ -66,7 +67,8 @@ public class ApplicationInitConfig {
                             p.getName().equals("CREATE_ORDER") ||
                             p.getName().equals("VIEW_ORDER") ||
                             p.getName().equals("CREATE_SELLER") ||
-                            p.getName().equals("UPDATE_USER"))
+                            p.getName().equals("UPDATE_USER") ||
+                            p.getName().equals("UPLOAD_FILE"))
                     .toList());
 
             // Initialize roles
