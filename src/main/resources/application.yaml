@@ -21,6 +21,17 @@ spring:
       host: ${DBKK_CONNECTION:redis}
       port: 6379
       database: 0
+  cloud:
+    openfeign:
+      client:
+        config:
+          user-service:
+            url: ${FEIGN_USER:http://user-service:8082}
+            connect-timeout: 60000
+            read-timeout: 120000
+          default:
+            connect-timeout: 60000
+            read-timeout: 120000
 jwt:
   signerKey: ${JWT_SIGNERKEY:1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij}
   valid-duration: 3600 #in seconds
