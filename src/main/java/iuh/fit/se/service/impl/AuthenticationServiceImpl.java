@@ -151,16 +151,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void changePassword( ChangePasswordRequest request) {
         // Lấy email từ token JWT
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-
+        String id = SecurityContextHolder.getContext().getAuthentication().getName();
         // Tìm người dùng trong database
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-
+//        User user = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.USER_NOT_FOUND));
         // Kiểm tra mật khẩu cũ
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new AppException(ErrorCode.PASSWORD_INCORRECT);
         }
-
         // Cập nhật mật khẩu mới
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);

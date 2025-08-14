@@ -49,8 +49,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponse getMyInfo() {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+//        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        String id = SecurityContextHolder.getContext().getAuthentication().getName();
+//        User user = userRepository.findByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         return userMapper.toUserResponse(user);
     }
 

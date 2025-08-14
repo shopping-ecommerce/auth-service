@@ -56,7 +56,7 @@ public class JwtUtil {
     public String generateToken(User user) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         JWTClaimsSet.Builder claimsBuilder = new JWTClaimsSet.Builder()
-                .subject(user.getEmail())
+                .subject(user.getId())
                 .issuer("Shopping")
                 //                .audience(user.getFirstName())
 //                .claim("scope", buildScopes(user))
