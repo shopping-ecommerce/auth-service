@@ -49,22 +49,22 @@ public class UserController {
         return ResponseEntity.ok(userService.findByRole(role));
     }
 
-    /**
-     * Get a user by email.
-     *
-     * @param email the email of the user
-     * @return the user information
-     */
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/search/e/{email}")
-    public ResponseEntity<UserResponse> getUserByEmail(@PathVariable String email) {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        log.info("User: {}", authentication.getPrincipal());
-        log.info("Name: {}", authentication.getName());
-        log.info("Authorities: ");
-        authentication.getAuthorities().forEach(s -> log.info(s.getAuthority()));
-        return ResponseEntity.ok(userService.findByEmail(email));
-    }
+//    /**
+//     * Get a user by email.
+//     *
+//     * @param email the email of the user
+//     * @return the user information
+//     */
+//    @PreAuthorize("hasRole('ADMIN')")
+//    @GetMapping("/search/e/{email}")
+//    public ResponseEntity<UserResponse> getUserByEmail(@PathVariable String email) {
+//        var authentication = SecurityContextHolder.getContext().getAuthentication();
+//        log.info("User: {}", authentication.getPrincipal());
+//        log.info("Name: {}", authentication.getName());
+//        log.info("Authorities: ");
+//        authentication.getAuthorities().forEach(s -> log.info(s.getAuthority()));
+//        return ResponseEntity.ok(userService.findByEmail(email));
+//    }
 
     /**
      * Create a new user.
