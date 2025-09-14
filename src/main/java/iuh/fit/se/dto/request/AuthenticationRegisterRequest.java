@@ -29,6 +29,5 @@ public class AuthenticationRegisterRequest {
     @Pattern(regexp = "^[\\p{L}\\s]+$", message = "NAME_INVALID")
     String lastName;
 
-    @NotEmpty(message = "Address must not be empty")
     String address;
 }

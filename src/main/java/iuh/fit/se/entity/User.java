@@ -17,7 +17,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "Users")
+@Table(name = "Users",
+        indexes = {
+                @Index(name = "idx_user_email", columnList = "email", unique = true)  // Tạo index cho email, unique nếu cần
+        })
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class User {
     @Id

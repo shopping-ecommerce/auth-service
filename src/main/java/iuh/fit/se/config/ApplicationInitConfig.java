@@ -46,6 +46,7 @@ public class ApplicationInitConfig {
             allPermissions.add(Permission.builder().name("DELETE_PRODUCT").description("Delete an existing product").build());
             allPermissions.add(Permission.builder().name("VIEW_PRODUCT").description("View product details").build());
             allPermissions.add(Permission.builder().name("CREATE_ORDER").description("Create a new order").build());
+            allPermissions.add(Permission.builder().name("UPDATE_ORDER").description("Update an existing order").build());
             allPermissions.add(Permission.builder().name("DELETE_ORDER").description("Delete an existing order").build());
             allPermissions.add(Permission.builder().name("VIEW_ORDER").description("View order details").build());
             allPermissions.add(Permission.builder().name("UPLOAD_FILE").description("Upload file to S3").build());
@@ -59,7 +60,10 @@ public class ApplicationInitConfig {
                             p.getName().equals("UPDATE_PRODUCT") ||
                             p.getName().equals("DELETE_PRODUCT") ||
                             p.getName().equals("VIEW_PRODUCT") ||
-                            p.getName().equals("VIEW_ORDER"))
+                            p.getName().equals("VIEW_ORDER")||
+                            p.getName().equals("UPDATE_SELLER") ||
+                            p.getName().equals("VIEW_SELLER")||
+                            p.getName().equals("UPDATE_ORDER"))
                     .toList());
             Set<Permission> customerPermissions = new HashSet<>();
             customerPermissions.addAll(allPermissions.stream()
