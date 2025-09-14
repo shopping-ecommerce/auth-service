@@ -3,6 +3,7 @@ package iuh.fit.se.service.impl;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -165,11 +166,11 @@ public class UserServiceImpl implements UserService {
      * @param id the id of the user to be found
      * @return UserResponse the found user details
      */
-    //        @Override
-    //        public UserResponse findById(String id) {
-    //            Optional<User> user = userRepository.findById(id);
-    //            return objectMapper.convertValue(user.get(), UserResponse.class);
-    //        }
+            @Override
+            public UserResponse findByUserId(String id) {
+                Optional<User> user = userRepository.findById(id);
+                return userMapper.toUserResponse(user.orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
+            }
 
     /**
      * Deletes multiple users identified by their ids by marking them as deleted.

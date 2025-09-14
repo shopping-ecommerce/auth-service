@@ -21,6 +21,8 @@ public interface UserService {
     //    //
     UserResponse findByEmail(String email);
 
+    UserResponse findByUserId(String userId);
+
     List<UserResponse> findUsers();
 
     List<UserResponse> findByRole(String role);

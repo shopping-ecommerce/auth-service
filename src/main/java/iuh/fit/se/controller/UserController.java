@@ -95,11 +95,18 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUser(id, request));
     }
 
-    @PreAuthorize("hasAuthority('VIEW_USER')")
     @GetMapping("/myinfo")
     public ApiResponse<UserResponse> getMyInfo() {
         return ApiResponse.<UserResponse>builder()
                 .result(userService.getMyInfo())
                 .build();
     }
+
+    @GetMapping("/search/{userId}")
+    public ApiResponse<UserResponse> getUserById(@PathVariable String userId) {
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.findByUserId(userId))
+                .build();
+    }
+
 }
