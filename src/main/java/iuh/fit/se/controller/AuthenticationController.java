@@ -162,7 +162,7 @@ public class AuthenticationController {
         authenticationService.revokeRoleFromUser(request);
         return ApiResponse.<String>builder()
                 .code(200)
-                .result("Assign role successfully")
+                .result("Revoke role successfully")
                 .build();
     }
 }
