@@ -155,4 +155,14 @@ public class AuthenticationController {
                 .result("Assign role successfully")
                 .build();
     }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/revoke-role")
+    public ApiResponse<String> revokeRole(@RequestBody RevokeRoleRequest request) throws JsonProcessingException {
+        authenticationService.revokeRoleFromUser(request);
+        return ApiResponse.<String>builder()
+                .code(200)
+                .result("Assign role successfully")
+                .build();
+    }
 }
