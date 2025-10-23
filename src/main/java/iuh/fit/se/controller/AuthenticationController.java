@@ -156,7 +156,7 @@ public class AuthenticationController {
                 .build();
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('UPDATE_SELLER')")
     @PostMapping("/revoke-role")
     public ApiResponse<String> revokeRole(@RequestBody RevokeRoleRequest request) throws JsonProcessingException {
         authenticationService.revokeRoleFromUser(request);
