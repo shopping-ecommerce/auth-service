@@ -38,6 +38,7 @@ import iuh.fit.se.service.UserService;
 import iuh.fit.se.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -219,5 +220,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             userRepository.save(user);
         }
     }
+    @Override
+    @Transactional
+    public void revokeRoleFromUser(RevokeRoleRequest request) throws JsonProcessingException {
+        // 1) Tìm user + role cần thu hồi
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
+        Role sellerRole = roleRepository.findByName(UserRoleEnum.SELLER.name());
+
+        // 2) Nếu user không có role này thì thôi
+        Set<Role> roles = new HashSet<>(user.getRoles() == null ? Set.of() : user.getRoles());
+        if (!roles.contains(sellerRole)) {
+            return; // Không làm gì thêm
+        }
+        // 3) Gỡ role ra
+        roles.remove(sellerRole);
+        user.setRoles(roles);
+        userRepository.save(user);
+    }
 }

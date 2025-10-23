@@ -9,6 +9,7 @@ import iuh.fit.se.dto.request.*;
 import iuh.fit.se.dto.response.AuthenticationResponse;
 import iuh.fit.se.dto.response.IntrospectResponse;
 import iuh.fit.se.dto.response.UserResponse;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface AuthenticationService {
 
@@ -29,4 +30,7 @@ public interface AuthenticationService {
     AuthenticationResponse verifyEmail(VerifyOTPRequest request) throws JsonProcessingException;
 
     void assignRoleToUser(AssignRoleRequest request) throws JsonProcessingException;
+
+    @Transactional
+    void revokeRoleFromUser(RevokeRoleRequest request) throws JsonProcessingException;
 }
