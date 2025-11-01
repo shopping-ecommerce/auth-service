@@ -6,28 +6,24 @@
 Auth-Service là một microservice backend xử lý xác thực và ủy quyền cho ứng dụng e-commerce (dựa trên các role như ADMIN, SELLER, CUSTOMER). Xây dựng bằng **Spring Boot 3.x**, sử dụng **JWT** cho token-based authentication, **MariaDB** làm database chính, **Redis** cho caching/session/OTP, và **Kafka** cho event streaming. Service hỗ trợ đăng ký/đăng nhập qua email/password, quản lý role/permission, cleanup token hết hạn tự động, và tích hợp Feign client để gọi các service khác (như user-service).
 
 Dự án tập trung vào bảo mật (OAuth2 Resource Server, BCrypt encoding) và scalability (batch processing, scheduling).
-
 ### 🏗️ Architecture
 Kiến trúc microservices với Auth-Service làm core cho authentication. Các thành phần chính:
 - **Communication**: REST API (Feign cho inter-service), Kafka cho events (NotificationEvent).
 - **Database**: MariaDB (JPA/Hibernate), Redis (caching OTP, sessions).
 - **Security**: JWT (HS512), Role-based Access Control (RBAC) với permissions.
 - **Deployment**: Docker + Kubernetes (giả định), port 8080.
-
-*(Diagram mẫu - thay bằng Draw.io nếu cần. Dưới là Mermaid code, GitHub sẽ render tự động:)*
-
 ```mermaid
 graph TD
-    A[Client/App] -->|REST API| B[Auth-Service (Port 8080)]
+    A[Client / App] -->|REST API| B[Auth-Service Port 8080]
     B -->|JWT Decode| C[CustomJwtDecoder]
-    B -->|Save/Invalidate| D[Redis (OTP/Session)]
-    B -->|Persist User/Role| E[MariaDB (auth_db)]
-    B -->|Events| F[Kafka (NotificationEvent)]
-    B -->|Feign Client| G[User-Service (Port 8082)]
+    B -->|Save / Invalidate| D[Redis OTP / Session]
+    B -->|Persist User / Role| E[MariaDB auth_db]
+    B -->|Events| F[Kafka NotificationEvent]
+    B -->|Feign Client| G[User-Service Port 8082]
     H[Batch Job] -->|Cleanup| I[InvalidatedToken Table]
+    
     style B fill:#f9f,stroke:#333,stroke-width:2px
 ```
-
 ## ✨ Tính Năng Chính
 - **Authentication**: Đăng nhập email/password, refresh token, logout (invalidate token), verify JWT/OTP.
 - **Authorization**: RBAC với roles (ADMIN, SELLER, CUSTOMER) và permissions (e.g., CREATE_USER, VIEW_PRODUCT).
