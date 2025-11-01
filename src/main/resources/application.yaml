@@ -36,3 +36,9 @@ jwt:
   signerKey: ${JWT_SIGNERKEY:1TjXchw5FloESb63Kc+DFhTARvpWL4jUGCwfGWxuG5SIf/1y/LgJxHnMqaF6A/ij}
   valid-duration: 3600 #in seconds
   refreshable-duration: 360000 #in seconds
+
+invalid-token:
+  cleanup:
+    enabled: true
+    cron: "0 0 2 * * MON"   # 2:00 sáng Thứ Hai hằng tuần
+    batch-size: 500
