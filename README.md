@@ -15,14 +15,15 @@ Kiến trúc microservices với Auth-Service làm core cho authentication. Các
 - **Deployment**: Docker + Kubernetes (giả định), port 8080.
 
 ```mermaid
+%%{init: {'theme': 'default'}}%%
 graph TD
-    A[Client / App] -->|REST API| B[Auth-Service (Port 8080)];
-    B -->|JWT Decode| C[CustomJwtDecoder];
-    B -->|Save / Invalidate| D[Redis (OTP / Session)];
-    B -->|Persist User / Role| E[MariaDB (auth_db)];
-    B -->|Events| F[Kafka (NotificationEvent)];
-    B -->|Feign Client| G[User-Service (Port 8082)];
-    H[Batch Job] -->|Cleanup| I[InvalidatedToken Table];
+    A["Client / App"] -->|"REST API"| B["Auth-Service (Port 8080)"];
+    B -->|"JWT Decode"| C["CustomJwtDecoder"];
+    B -->|"Save / Invalidate"| D["Redis (OTP / Session)"];
+    B -->|"Persist User / Role"| E["MariaDB (auth_db)"];
+    B -->|"Events"| F["Kafka (NotificationEvent)"];
+    B -->|"Feign Client"| G["User-Service (Port 8082)"];
+    H["Batch Job"] -->|"Cleanup"| I["InvalidatedToken Table"];
     style B fill:#f9f,stroke:#333,stroke-width:2px;
  ```
 ## ✨ Tính Năng Chính
