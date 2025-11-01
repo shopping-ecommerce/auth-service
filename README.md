@@ -14,8 +14,6 @@ Kiến trúc microservices với Auth-Service làm core cho authentication. Các
 - **Security**: JWT (HS512), Role-based Access Control (RBAC) với permissions.
 - **Deployment**: Docker + Kubernetes (giả định), port 8080.
 
-*(Diagram mẫu - thay bằng Draw.io nếu cần. Dưới là Mermaid code, GitHub sẽ render tự động:)*
-
 ```mermaid
 graph TD
     A[Client/App] -->|REST API| B[Auth-Service (Port 8080)]
@@ -26,8 +24,7 @@ graph TD
     B -->|Feign Client| G[User-Service (Port 8082)]
     H[Batch Job] -->|Cleanup| I[InvalidatedToken Table]
     style B fill:#f9f,stroke:#333,stroke-width:2px
-```
-
+ ```
 ## ✨ Tính Năng Chính
 - **Authentication**: Đăng nhập email/password, refresh token, logout (invalidate token), verify JWT/OTP.
 - **Authorization**: RBAC với roles (ADMIN, SELLER, CUSTOMER) và permissions (e.g., CREATE_USER, VIEW_PRODUCT).
