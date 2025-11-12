@@ -1,6 +1,7 @@
 package iuh.fit.se.service.impl;
 
 import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.HashSet;
@@ -238,5 +239,56 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         roles.remove(sellerRole);
         user.setRoles(roles);
         userRepository.save(user);
+    }
+
+
+    @Override
+    public AuthenticationResponse forgotPassword(ForgotPasswordRequest request) {
+        String email = request.getEmail();
+
+        // Kiểm tra email có tồn tại không
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // Tạo và gửi OTP
+        otpService.createAndSaveOTP(email);
+
+        log.info("Forgot password OTP sent to email: {}", email);
+
+        return AuthenticationResponse.builder()
+                .message("OTP has been sent to your email")
+                .build();
+    }
+
+    @Override
+    public AuthenticationResponse resetPassword(ResetPasswordRequest request) {
+        String email = request.getEmail();
+        String otp = request.getOtp();
+        String newPassword = request.getNewPassword();
+
+        // Xác thực OTP
+        VerifyOTPRequest verifyRequest = VerifyOTPRequest.builder()
+                .email(email)
+                .otp(otp)
+                .build();
+
+        boolean isOtpValid = otpService.verifyOTP(verifyRequest);
+        if (!isOtpValid) {
+            throw new AppException(ErrorCode.INCORRECT_OTP);
+        }
+
+        // Tìm user và cập nhật mật khẩu
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setModifiedTime(LocalDateTime.now());
+        userRepository.save(user);
+
+        log.info("Password reset successfully for email: {}", email);
+
+        return AuthenticationResponse.builder()
+                .message("Password has been reset successfully")
+                .build();
     }
 }

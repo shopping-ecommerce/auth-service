@@ -38,7 +38,9 @@ public class SecurityConfig {
         "/authentication/refresh",
         "/authentication/register",
         "/authentication/verifyOTP",
-        "/authentication/verifyFromEmail"
+        "/authentication/verifyFromEmail",
+            "/authentication/forgot-password",
+            "/authentication/reset-password"
     };
     private final JwtUtil jwtUtil;
 

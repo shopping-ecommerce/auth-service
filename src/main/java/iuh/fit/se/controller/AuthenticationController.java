@@ -165,4 +165,32 @@ public class AuthenticationController {
                 .result("Revoke role successfully")
                 .build();
     }
+
+    /**
+     * Endpoint để gửi OTP reset mật khẩu
+     * Người dùng nhập email, hệ thống gửi OTP qua email
+     */
+    @PostMapping("/forgot-password")
+    public ApiResponse<AuthenticationResponse> forgotPassword(
+            @RequestBody @Valid ForgotPasswordRequest request) {
+        log.info("Forgot password request for email: {}", request.getEmail());
+        AuthenticationResponse response = authenticationService.forgotPassword(request);
+        return ApiResponse.<AuthenticationResponse>builder()
+                .result(response)
+                .build();
+    }
+
+    /**
+     * Endpoint để reset mật khẩu với OTP
+     * Người dùng nhập email, OTP và mật khẩu mới
+     */
+    @PostMapping("/reset-password")
+    public ApiResponse<AuthenticationResponse> resetPassword(
+            @RequestBody @Valid ResetPasswordRequest request) {
+        log.info("Reset password request for email: {}", request.getEmail());
+        AuthenticationResponse response = authenticationService.resetPassword(request);
+        return ApiResponse.<AuthenticationResponse>builder()
+                .result(response)
+                .build();
+    }
 }
