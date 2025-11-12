@@ -33,4 +33,18 @@ public interface AuthenticationService {
 
     @Transactional
     void revokeRoleFromUser(RevokeRoleRequest request) throws JsonProcessingException;
+
+    /**
+     * Gửi OTP để reset mật khẩu
+     * @param request chứa email người dùng
+     * @return AuthenticationResponse thông báo gửi OTP thành công
+     */
+    AuthenticationResponse forgotPassword(ForgotPasswordRequest request);
+
+    /**
+     * Reset mật khẩu với OTP
+     * @param request chứa email, OTP và mật khẩu mới
+     * @return AuthenticationResponse thông báo reset mật khẩu thành công
+     */
+    AuthenticationResponse resetPassword(ResetPasswordRequest request);
 }
