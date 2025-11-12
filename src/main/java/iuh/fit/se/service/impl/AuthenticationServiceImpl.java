@@ -243,7 +243,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 
     @Override
-    public AuthenticationResponse forgotPassword(ForgotPasswordRequest request) {
+    public AuthenticationResponse sendOTPForgotPassword(ForgotPasswordRequest request) {
         String email = request.getEmail();
 
         // Kiểm tra email có tồn tại không
@@ -253,7 +253,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // Tạo và gửi OTP
         otpService.createAndSaveOTP(email);
 
-        log.info("Forgot password OTP sent to email: {}", email);
+        log.info("Forgot password - OTP sent to email: {}", email);
 
         return AuthenticationResponse.builder()
                 .message("OTP has been sent to your email")
@@ -261,10 +261,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public AuthenticationResponse resetPassword(ResetPasswordRequest request) {
+    public AuthenticationResponse verifyOTPForgotPassword(VerifyOTPForgotPasswordRequest request) {
         String email = request.getEmail();
         String otp = request.getOtp();
-        String newPassword = request.getNewPassword();
 
         // Xác thực OTP
         VerifyOTPRequest verifyRequest = VerifyOTPRequest.builder()
@@ -277,13 +276,44 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AppException(ErrorCode.INCORRECT_OTP);
         }
 
+        // Lưu flag vào Redis để đánh dấu OTP đã được verify (TTL 5 phút)
+        String verifiedKey = "reset-password:verified:" + email;
+        redisTemplate.opsForValue().set(verifiedKey, "true", 5, TimeUnit.MINUTES);
+
+        log.info("Forgot password - OTP verified for email: {}", email);
+
+        return AuthenticationResponse.builder()
+                .message("OTP verified successfully")
+                .build();
+    }
+
+    @Override
+    public AuthenticationResponse resetPasswordWithNewPassword(ResetPasswordRequest request) throws JsonProcessingException {
+        String email = request.getEmail();
+        String newPassword = request.getNewPassword();
+        String confirmPassword = request.getConfirmPassword();
+
+        // Kiểm tra mật khẩu và xác nhận mật khẩu có khớp không
+        if (!newPassword.equals(confirmPassword)) {
+            throw new AppException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+
+        // Kiểm tra xem OTP đã được verify chưa
+        String verifiedKey = "reset-password:verified:" + email;
+        String isVerified = redisTemplate.opsForValue().get(verifiedKey);
+        if (isVerified == null) {
+            throw new AppException(ErrorCode.OTP_NOT_VERIFIED);
+        }
+
         // Tìm user và cập nhật mật khẩu
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
         user.setPassword(passwordEncoder.encode(newPassword));
-        user.setModifiedTime(LocalDateTime.now());
         userRepository.save(user);
+
+        // Xóa flag verified sau khi đổi mật khẩu thành công
+        redisTemplate.delete(verifiedKey);
 
         log.info("Password reset successfully for email: {}", email);
 

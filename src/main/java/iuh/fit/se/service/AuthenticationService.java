@@ -35,16 +35,23 @@ public interface AuthenticationService {
     void revokeRoleFromUser(RevokeRoleRequest request) throws JsonProcessingException;
 
     /**
-     * Gửi OTP để reset mật khẩu
+     * Bước 1: Gửi OTP về email để reset mật khẩu
      * @param request chứa email người dùng
-     * @return AuthenticationResponse thông báo gửi OTP thành công
+     * @return AuthenticationResponse thông báo đã gửi OTP
      */
-    AuthenticationResponse forgotPassword(ForgotPasswordRequest request);
+    AuthenticationResponse sendOTPForgotPassword(ForgotPasswordRequest request);
 
     /**
-     * Reset mật khẩu với OTP
-     * @param request chứa email, OTP và mật khẩu mới
-     * @return AuthenticationResponse thông báo reset mật khẩu thành công
+     * Bước 2: Xác thực OTP
+     * @param request chứa email và OTP
+     * @return AuthenticationResponse thông báo OTP hợp lệ
      */
-    AuthenticationResponse resetPassword(ResetPasswordRequest request);
+    AuthenticationResponse verifyOTPForgotPassword(VerifyOTPForgotPasswordRequest request);
+
+    /**
+     * Bước 3: Đặt mật khẩu mới
+     * @param request chứa email, mật khẩu mới và xác nhận mật khẩu
+     * @return AuthenticationResponse thông báo đổi mật khẩu thành công
+     */
+    AuthenticationResponse resetPasswordWithNewPassword(ResetPasswordRequest request) throws JsonProcessingException;
 }
