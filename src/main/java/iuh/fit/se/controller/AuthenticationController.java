@@ -167,28 +167,42 @@ public class AuthenticationController {
     }
 
     /**
-     * Endpoint để gửi OTP reset mật khẩu
-     * Người dùng nhập email, hệ thống gửi OTP qua email
+     * BƯỚC 1: Gửi OTP về email
+     * User nhập email -> Backend gửi OTP -> Chuyển sang trang nhập OTP
      */
-    @PostMapping("/forgot-password")
-    public ApiResponse<AuthenticationResponse> forgotPassword(
+    @PostMapping("/forgot-password/send-otp")
+    public ApiResponse<AuthenticationResponse> sendOTPForgotPassword(
             @RequestBody @Valid ForgotPasswordRequest request) {
-        log.info("Forgot password request for email: {}", request.getEmail());
-        AuthenticationResponse response = authenticationService.forgotPassword(request);
+        log.info("Step 1 - Send OTP for forgot password to email: {}", request.getEmail());
+        AuthenticationResponse response = authenticationService.sendOTPForgotPassword(request);
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(response)
                 .build();
     }
 
     /**
-     * Endpoint để reset mật khẩu với OTP
-     * Người dùng nhập email, OTP và mật khẩu mới
+     * BƯỚC 2: Xác thực OTP
+     * User nhập OTP -> Backend verify -> Nếu đúng chuyển sang trang nhập mật khẩu mới
      */
-    @PostMapping("/reset-password")
-    public ApiResponse<AuthenticationResponse> resetPassword(
-            @RequestBody @Valid ResetPasswordRequest request) {
-        log.info("Reset password request for email: {}", request.getEmail());
-        AuthenticationResponse response = authenticationService.resetPassword(request);
+    @PostMapping("/forgot-password/verify-otp")
+    public ApiResponse<AuthenticationResponse> verifyOTPForgotPassword(
+            @RequestBody @Valid VerifyOTPForgotPasswordRequest request) {
+        log.info("Step 2 - Verify OTP for forgot password for email: {}", request.getEmail());
+        AuthenticationResponse response = authenticationService.verifyOTPForgotPassword(request);
+        return ApiResponse.<AuthenticationResponse>builder()
+                .result(response)
+                .build();
+    }
+
+    /**
+     * BƯỚC 3: Đặt mật khẩu mới
+     * User nhập mật khẩu mới + xác nhận mật khẩu -> Backend update mật khẩu
+     */
+    @PostMapping("/forgot-password/reset-password")
+    public ApiResponse<AuthenticationResponse> resetPasswordWithNewPassword(
+            @RequestBody @Valid ResetPasswordRequest request) throws JsonProcessingException {
+        log.info("Step 3 - Reset password for email: {}", request.getEmail());
+        AuthenticationResponse response = authenticationService.resetPasswordWithNewPassword(request);
         return ApiResponse.<AuthenticationResponse>builder()
                 .result(response)
                 .build();
