@@ -3,6 +3,8 @@ package iuh.fit.se.config;
 import java.util.HashSet;
 import java.util.Set;
 
+import iuh.fit.se.dto.request.UserClientRequest;
+import iuh.fit.se.repository.httpclient.UserClient;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ApplicationInitConfig {
     PasswordEncoder passwordEncoder;
-
+    UserClient userClient;
     @Bean
     ApplicationRunner applicationRunner(
             UserRepository userRepository, PermissionRepository permissionRepository, RoleRepository roleRepository) {
@@ -107,6 +109,11 @@ public class ApplicationInitConfig {
                         .build();
                 userRepository.save(user);
                 log.warn("Admin user has been created with default password: admin");
+                userClient.createUser(UserClientRequest.builder()
+                                .accountId(user.getId())
+                                .firstName("Quản trị")
+                                .lastName("viên")
+                        .build());
             }
         };
     }
