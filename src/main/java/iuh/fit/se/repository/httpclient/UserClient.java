@@ -14,7 +14,7 @@ import iuh.fit.se.dto.response.UserClientResponse;
 
 @FeignClient(
         name = "user-service",
-        configuration = {AuthenticationRequestInterceptor.class, UserClient.FeignRetryConfig.class
+        configuration = {UserClient.FeignRetryConfig.class
         })
 public interface UserClient {
     @PostMapping(value = "/info/profiles/create", produces = MediaType.APPLICATION_JSON_VALUE)

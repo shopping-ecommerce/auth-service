@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
 public class UserClientRequest {
     @JsonProperty("accountId")
     String accountId; // Thay accountid → accountId
